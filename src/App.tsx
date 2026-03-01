@@ -12,7 +12,8 @@ export default function App() {
     activeTab,
     view,
     saveStatus,
-    isEditing,
+    savedAction,
+    openedForEdit,
     editorTitle,
     editorBody,
     category,
@@ -47,11 +48,12 @@ export default function App() {
             body={editorBody}
             category={category}
             saveStatus={saveStatus}
-            isEditing={isEditing}
+            savedAction={savedAction}
+            canDelete={openedForEdit}
             onTitleChange={handleTitleChange}
             onBodyChange={handleBodyChange}
             onCategoryChange={handleCategoryChange}
-            onSave={savePost}
+            onSave={() => savePost("self")}
             onSaveAndShare={saveAndShare}
             onDelete={deletePost}
           />

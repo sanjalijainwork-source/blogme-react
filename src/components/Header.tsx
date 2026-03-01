@@ -1,4 +1,3 @@
-import { PenLine } from "lucide-react";
 import type { Tab } from "../types";
 
 interface HeaderProps {
@@ -29,14 +28,13 @@ export default function Header({
           </p>
         </div>
 
-        {/* Write button — hidden on editor tab */}
+        {/* Write button — hidden on editor tab; outline to stand out */}
         {activeTab !== "new" && (
           <button
             onClick={onNewPost}
-            className="flex items-center gap-1.5 text-[0.82rem] font-semibold px-5 py-2 border-[1.5px] border-[var(--color-stone-600)] text-[var(--color-stone-600)] rounded-full transition-all duration-250 hover:bg-[var(--color-stone-600)] hover:text-white group leading-tight"
+            className="text-[0.85rem] font-semibold tracking-wide py-1.5 px-3 rounded-full border-[1.5px] border-stone-500 text-[var(--color-stone-700)] bg-stone-100 transition-all duration-250 leading-tight hover:bg-stone-200 hover:border-stone-600"
           >
-            <PenLine className="w-4 h-4 text-[var(--color-stone-600)] group-hover:text-white transition-colors" />
-            <span className="max-md:hidden">Write</span>
+            Write
           </button>
         )}
       </div>

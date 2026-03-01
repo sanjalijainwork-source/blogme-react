@@ -9,7 +9,8 @@ interface EditorViewProps {
   body: string;
   category: string;
   saveStatus: SaveStatus;
-  isEditing: boolean;
+  savedAction: "self" | "share" | null;
+  canDelete: boolean;
   onTitleChange: (value: string) => void;
   onBodyChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
@@ -23,7 +24,8 @@ export default function EditorView({
   body,
   category,
   saveStatus,
-  isEditing,
+  savedAction,
+  canDelete,
   onTitleChange,
   onBodyChange,
   onCategoryChange,
@@ -64,8 +66,8 @@ export default function EditorView({
 
         {/* Actions */}
         <div className="flex items-center gap-3 w-fit">
-          {/* Delete */}
-          {isEditing && (
+          {/* Delete — only when editing a post that was opened from My Stories */}
+          {canDelete && (
             <button
               onClick={onDelete}
               title="Delete post"
@@ -75,19 +77,25 @@ export default function EditorView({
             </button>
           )}
 
-          {/* Publish for Self — outline */}
+          {/* For Self — outline; tick when just saved */}
           <button
             onClick={onSave}
-            className="text-[14px] font-normal px-3 py-2 border-[1.5px] border-[var(--color-stone-300)] rounded-[999px] transition-all duration-250 leading-tight hover:border-[var(--color-stone-400)] w-fit whitespace-nowrap bg-transparent box-border text-[var(--color-stone-800)]"
+            className="flex items-center gap-1.5 text-[14px] font-normal px-3 py-2 border-[1.5px] border-[var(--color-stone-300)] rounded-[999px] transition-all duration-250 leading-tight hover:border-[var(--color-stone-400)] w-fit whitespace-nowrap bg-transparent box-border text-[var(--color-stone-800)]"
           >
-            {isEditing ? "Update" : "For Self"}
+            {savedAction === "self" ? (
+              <CheckCircle className="w-4 h-4 text-[var(--color-stone-600)] shrink-0" />
+            ) : null}
+            For Self
           </button>
 
-          {/* Share — green */}
+          {/* Share — green; tick when just saved */}
           <button
             onClick={onSaveAndShare}
-            className="text-[14px] font-normal px-3 py-2 border-[1.5px] border-transparent bg-green-600 text-white rounded-full transition-all duration-250 leading-tight hover:bg-green-700 hover:-translate-y-px hover:shadow-lg w-fit whitespace-nowrap box-border"
+            className="flex items-center gap-1.5 text-[14px] font-normal px-3 py-2 border-[1.5px] border-transparent bg-green-600 text-white rounded-full transition-all duration-250 leading-tight hover:bg-green-700 hover:-translate-y-px hover:shadow-lg w-fit whitespace-nowrap box-border"
           >
+            {savedAction === "share" ? (
+              <CheckCircle className="w-4 h-4 text-white shrink-0" />
+            ) : null}
             Share
           </button>
         </div>

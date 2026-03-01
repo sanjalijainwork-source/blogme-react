@@ -19,6 +19,8 @@ export function useApp() {
   const [view, setView] = useState<View>("editor");
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("unsaved");
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [openedForEdit, setOpenedForEdit] = useState(false);
+  const [savedAction, setSavedAction] = useState<"self" | "share" | null>(null);
 
   const editorTitle = useRef("");
   const editorBody = useRef("");
@@ -41,8 +43,17 @@ export function useApp() {
     setSaveStatus("unsaved");
   }, []);
 
-  const markSaved = useCallback(() => {
+  const savedActionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const markSaved = useCallback((action?: "self" | "share") => {
     setSaveStatus("saved");
+    if (action) {
+      setSavedAction(action);
+      if (savedActionTimeoutRef.current) clearTimeout(savedActionTimeoutRef.current);
+      savedActionTimeoutRef.current = setTimeout(() => {
+        setSavedAction(null);
+        savedActionTimeoutRef.current = null;
+      }, 1800);
+    }
   }, []);
 
   // Load posts on mount: try API first, fall back to localStorage
@@ -78,6 +89,7 @@ export function useApp() {
     if (tab === "stories") {
       setView("feed");
     } else if (tab === "new") {
+      setOpenedForEdit(false);
       setCurrentPostId(null);
       setEditorTitleState("");
       setEditorBodyState("");
@@ -89,15 +101,18 @@ export function useApp() {
 
   const openEditor = useCallback(
     (postId?: string) => {
+      setSavedAction(null);
       if (postId) {
         const post = posts.find((p) => p.id === postId);
         if (!post) return;
+        setOpenedForEdit(true);
         setCurrentPostId(postId);
         setEditorTitleState(post.title);
         setEditorBodyState(post.body);
         setCategoryState(post.category);
         setSaveStatus("saved");
       } else {
+        setOpenedForEdit(false);
         setCurrentPostId(null);
         setEditorTitleState("");
         setEditorBodyState("");
@@ -109,7 +124,7 @@ export function useApp() {
     [posts],
   );
 
-  const savePost = useCallback(async () => {
+  const savePost = useCallback(async (triggeredBy?: "self" | "share") => {
     const title = editorTitle.current.trim();
     const body = editorBody.current.trim();
     const cat = category.current;
@@ -139,7 +154,7 @@ export function useApp() {
           setCurrentPostId(created.id);
           setPosts((prev) => [created, ...prev]);
         }
-        markSaved();
+        markSaved(triggeredBy);
         return;
       } catch {
         apiAvailable.current = false;
@@ -173,7 +188,7 @@ export function useApp() {
         return next;
       }
     });
-    markSaved();
+    markSaved(triggeredBy);
   }, [currentPostId, markSaved]);
 
   const saveAndShare = useCallback(async () => {
@@ -197,7 +212,8 @@ export function useApp() {
     } else if (navigator.clipboard) {
       navigator.clipboard.writeText(shareText).catch(() => {});
     }
-  }, [savePost, currentPostId, posts]);
+    markSaved("share");
+  }, [savePost, currentPostId, posts, markSaved]);
 
   const triggerAutoSave = useCallback(() => {
     if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
@@ -353,7 +369,9 @@ export function useApp() {
     activeTab,
     view,
     saveStatus,
+    savedAction,
     isEditing,
+    openedForEdit,
     editorTitle: editorTitleState,
     editorBody: editorBodyState,
     category: categoryState,
