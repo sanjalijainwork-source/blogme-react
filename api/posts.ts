@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { ensureTable, db } from "./db";
+import { ensureTable, getDb } from "./db";
 
 function rowToPost(row: {
   id: string;
@@ -37,8 +37,10 @@ export default async function handler(
     return;
   }
 
+  let db: Awaited<ReturnType<typeof getDb>>;
   try {
     await ensureTable();
+    db = await getDb();
   } catch (e) {
     console.error("DB init error", e);
     res.status(500).json({ error: "Database unavailable" });

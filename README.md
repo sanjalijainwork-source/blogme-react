@@ -40,6 +40,12 @@ Make sure the project is in a Git repo (GitHub, GitLab, or Bitbucket) and push y
 
 After redeploy, the API will create the `posts` table on first use and your blogs will be stored in the database.
 
+### If it still says "Using local storage"
+
+1. **Check env vars** — In Vercel: Project → **Settings** → **Environment Variables**. You should see `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` (or the names your Turso integration uses). They must be set for **Production** (and optionally Preview).
+2. **Redeploy after adding Storage** — After connecting Turso, trigger a new deploy (Deployments → ⋮ → **Redeploy**) so the new variables are picked up.
+3. **Check the Turso URL** — The URL should start with `libsql://`. If your integration uses different names (e.g. `LIBSQL_URL`), the app supports those too.
+
 ### Optional: Deploy from the command line
 
 ```bash
