@@ -2,25 +2,25 @@ import { useApp } from "./useApp";
 import Header from "./components/Header";
 import FeedView from "./components/FeedView";
 import EditorView from "./components/EditorView";
-import ReadingView from "./components/ReadingView";
 import Footer from "./components/Footer";
 
 export default function App() {
   const {
     posts,
-    currentPost,
     activeTab,
     view,
     saveStatus,
     savedAction,
+    isViewMode,
     openedForEdit,
+    enterEditMode,
+    exitEditMode,
     editorTitle,
     editorBody,
     category,
     loadError,
     switchTab,
     openEditor,
-    openReading,
     savePost,
     saveAndShare,
     deletePost,
@@ -34,12 +34,12 @@ export default function App() {
       <Header
         activeTab={activeTab}
         onTabChange={switchTab}
-        onNewPost={() => openEditor()}
+        onNewPost={() => switchTab("new")}
       />
 
       <main className="px-6 min-h-[60vh] w-full">
         {view === "feed" && (
-          <FeedView posts={posts} onPostClick={openReading} />
+          <FeedView posts={posts} onPostClick={(id) => openEditor(id)} />
         )}
 
         {view === "editor" && (
@@ -56,15 +56,12 @@ export default function App() {
             onSave={() => savePost("self")}
             onSaveAndShare={saveAndShare}
             onDelete={deletePost}
+            isViewMode={isViewMode}
+            onEnterEditMode={enterEditMode}
+            onExitEditMode={exitEditMode}
           />
         )}
 
-        {view === "reading" && currentPost && (
-          <ReadingView
-            post={currentPost}
-            onEdit={() => openEditor(currentPost.id)}
-          />
-        )}
       </main>
 
       <Footer loadError={loadError} />

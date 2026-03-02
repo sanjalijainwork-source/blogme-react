@@ -14,7 +14,7 @@ export default function Header({
   return (
     <header className="px-6 pt-6">
       {/* Top row: title + write button */}
-      <div className="flex items-center justify-between pb-4">
+      <div className="flex items-center justify-between pb-6">
         <div className="flex flex-col flex-1">
           <h1
             className="text-[32px] font-medium leading-tight tracking-tight"
@@ -39,27 +39,24 @@ export default function Header({
         )}
       </div>
 
-      {/* Divider */}
-      <div className="h-px bg-[var(--color-border)]" />
-
-      {/* Tabs */}
-      <nav className="flex justify-start items-start gap-1.5 py-3 pb-3 h-fit">
+      {/* Tabs — underline style */}
+      <nav className="flex justify-start items-end gap-0 mb-3">
         <button
           onClick={() => onTabChange("new")}
-          className={`text-[0.85rem] font-medium tracking-wide px-5 py-2 rounded-full transition-all duration-250 leading-tight ${
+          className={`text-[0.9rem] font-medium tracking-wide px-3 py-2 pb-2 -mb-px border-b-2 transition-all duration-200 ${
             activeTab === "new"
-              ? "text-white bg-[var(--color-accent)]"
-              : "text-[var(--color-stone-500)] hover:text-[var(--color-text)] hover:bg-black/[0.04]"
+              ? "border-[var(--color-accent)] text-[var(--color-text)]"
+              : "border-transparent text-[var(--color-stone-500)] hover:text-[var(--color-text)]"
           }`}
         >
           Begin a New Story
         </button>
         <button
           onClick={() => onTabChange("stories")}
-          className={`text-[0.85rem] font-medium tracking-wide px-5 py-2 rounded-full transition-all duration-250 leading-tight ${
+          className={`text-[0.9rem] font-medium tracking-wide px-3 py-2 pb-2 -mb-px border-b-2 transition-all duration-200 ${
             activeTab === "stories"
-              ? "text-white bg-[var(--color-accent)]"
-              : "text-[var(--color-stone-500)] hover:text-[var(--color-text)] hover:bg-black/[0.04]"
+              ? "border-[var(--color-accent)] text-[var(--color-text)]"
+              : "border-transparent text-[var(--color-stone-500)] hover:text-[var(--color-text)]"
           }`}
         >
           My Stories

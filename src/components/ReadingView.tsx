@@ -1,46 +1,56 @@
-import { PenLine } from "lucide-react";
+import { Check } from "lucide-react";
 import type { Post } from "../types";
-import { formatDate, countWords, readingTime, textToHTML } from "../utils";
+import { formatFullDate, countWords, textToHTML, stripHtml } from "../utils";
 
 interface ReadingViewProps {
   post: Post;
   onEdit: () => void;
 }
 
+function hasContent(body: string): boolean {
+  if (!body || !body.trim()) return false;
+  const plain = body.includes("<") ? stripHtml(body) : body;
+  return plain.trim().length > 0;
+}
+
 export default function ReadingView({ post, onEdit }: ReadingViewProps) {
+  const showBody = hasContent(post.body);
+
+  const wordCount = countWords(post.body);
+
   return (
-    <section className="max-w-full px-6 pb-20">
-      {/* Toolbar */}
-      <div className="flex items-center justify-end py-4 pb-5 border-b border-[var(--color-border-light)] mb-10">
-        <button
-          onClick={onEdit}
-          className="flex items-center gap-1.5 text-[0.82rem] font-medium text-[var(--color-stone-500)] transition-colors duration-250 leading-tight hover:text-[var(--color-text)]"
-        >
-          <PenLine className="w-4 h-4" />
-          <span>Edit</span>
-        </button>
+    <section className="max-w-full w-full pb-12">
+      {/* Date + save + words row — matches editor UI */}
+      <div className="flex items-center justify-between gap-2 mb-5">
+        <span className="text-[14px] uppercase tracking-wider whitespace-nowrap text-gray-500 font-medium leading-tight">
+          {formatFullDate(new Date(post.updatedAt))}
+        </span>
+        <span className="flex items-center justify-start gap-2 text-[14px] font-normal text-[var(--color-stone-400)] leading-tight">
+          <Check className="w-[16px] h-[16px] shrink-0 text-[var(--color-stone-600)]" />
+          {wordCount} word{wordCount !== 1 ? "s" : ""}
+        </span>
       </div>
 
-      {/* Article */}
       <article>
-        <div className="text-[0.75rem] font-bold tracking-wider text-[var(--color-stone-600)] mb-3.5 leading-tight">
-          {post.category}
-        </div>
         <h1
           className="text-[clamp(2rem,5vw,3rem)] font-bold leading-tight mb-4 tracking-tight"
           style={{ fontFamily: "var(--font-serif)" }}
         >
           {post.title || "Untitled"}
         </h1>
-        <div className="text-[0.78rem] text-[var(--color-stone-400)] pb-6 mb-7 border-b border-[var(--color-border-light)] tracking-wide leading-tight">
-          {formatDate(post.createdAt)} &nbsp;·&nbsp; {countWords(post.body)}{" "}
-          words &nbsp;·&nbsp; {readingTime(post.body)}
+
+        {showBody && (
+          <div
+            className="reading-body text-[1.08rem] leading-[1.75] tracking-wide [&_p]:mb-[1.5em] [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg"
+            style={{ fontFamily: "var(--font-sans)" }}
+            dangerouslySetInnerHTML={{ __html: textToHTML(post.body) }}
+          />
+        )}
+        <div className="mt-4">
+          <button onClick={onEdit} className="text-[0.9rem] font-medium text-[var(--color-stone-500)] hover:text-[var(--color-text)] transition-colors">
+            Edit
+          </button>
         </div>
-        <div
-          className="reading-body text-[1.08rem] leading-[1.75] tracking-wide [&_p]:mb-[1.5em]"
-          style={{ fontFamily: "var(--font-sans)" }}
-          dangerouslySetInnerHTML={{ __html: textToHTML(post.body) }}
-        />
       </article>
     </section>
   );

@@ -10,7 +10,7 @@ import {
   loadPostsFromStorage,
   savePostsToStorage,
 } from "./storage";
-import { generateId } from "./utils";
+import { generateId, stripHtml } from "./utils";
 
 export function useApp() {
   const [posts, setPosts] = useState<Post[]>(() => loadPostsFromStorage());
@@ -20,6 +20,7 @@ export function useApp() {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("unsaved");
   const [loadError, setLoadError] = useState<string | null>(null);
   const [openedForEdit, setOpenedForEdit] = useState(false);
+  const [isViewMode, setIsViewMode] = useState(false);
   const [savedAction, setSavedAction] = useState<"self" | "share" | null>(null);
 
   const editorTitle = useRef("");
@@ -90,6 +91,7 @@ export function useApp() {
       setView("feed");
     } else if (tab === "new") {
       setOpenedForEdit(false);
+      setIsViewMode(false);
       setCurrentPostId(null);
       setEditorTitleState("");
       setEditorBodyState("");
@@ -106,13 +108,16 @@ export function useApp() {
         const post = posts.find((p) => p.id === postId);
         if (!post) return;
         setOpenedForEdit(true);
+        setIsViewMode(true);
         setCurrentPostId(postId);
         setEditorTitleState(post.title);
         setEditorBodyState(post.body);
         setCategoryState(post.category);
         setSaveStatus("saved");
+        setActiveTab("new");
       } else {
         setOpenedForEdit(false);
+        setIsViewMode(false);
         setCurrentPostId(null);
         setEditorTitleState("");
         setEditorBodyState("");
@@ -206,7 +211,8 @@ export function useApp() {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
-    const shareText = `${sharePost.title}\n\n${sharePost.body}`;
+    const bodyPlain = sharePost.body.includes("<") ? stripHtml(sharePost.body) : sharePost.body;
+    const shareText = `${sharePost.title}\n\n${bodyPlain}`;
     if (navigator.share) {
       navigator.share({ title: sharePost.title, text: shareText }).catch(() => {});
     } else if (navigator.clipboard) {
@@ -363,6 +369,9 @@ export function useApp() {
     : null;
   const isEditing = !!currentPostId;
 
+  const enterEditMode = useCallback(() => setIsViewMode(false), []);
+  const exitEditMode = useCallback(() => setIsViewMode(true), []);
+
   return {
     posts,
     currentPost,
@@ -371,6 +380,7 @@ export function useApp() {
     saveStatus,
     savedAction,
     isEditing,
+    isViewMode,
     openedForEdit,
     editorTitle: editorTitleState,
     editorBody: editorBodyState,
@@ -378,6 +388,8 @@ export function useApp() {
     loadError,
     switchTab,
     openEditor,
+    enterEditMode,
+    exitEditMode,
     openReading,
     savePost,
     saveAndShare,

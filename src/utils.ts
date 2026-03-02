@@ -27,14 +27,23 @@ export function formatFullDate(date: Date): string {
   });
 }
 
+/** Strip HTML tags for word count / excerpt */
+export function stripHtml(html: string): string {
+  if (!html) return "";
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return (doc.body?.textContent ?? "").trim();
+}
+
 export function countWords(text: string): number {
   if (!text || !text.trim()) return 0;
-  return text.trim().split(/\s+/).length;
+  const plain = text.includes("<") ? stripHtml(text) : text;
+  return plain.trim().split(/\s+/).filter(Boolean).length;
 }
 
 export function excerpt(text: string, maxLen = 180): string {
   if (!text) return "";
-  const clean = text.replace(/\n+/g, " ").trim();
+  const plain = text.includes("<") ? stripHtml(text) : text;
+  const clean = plain.replace(/\n+/g, " ").trim();
   if (clean.length <= maxLen) return clean;
   return clean.slice(0, maxLen).replace(/\s+\S*$/, "") + "…";
 }
@@ -47,6 +56,7 @@ export function readingTime(text: string): string {
 
 export function textToHTML(text: string): string {
   if (!text) return "";
+  if (text.includes("<") && text.includes(">")) return text;
   return text
     .split(/\n\n+/)
     .map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`)
