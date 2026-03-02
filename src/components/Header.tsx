@@ -40,7 +40,7 @@ export default function Header({
       </div>
 
       {/* Tabs — underline style */}
-      <nav className="flex justify-start items-end gap-0 mb-3">
+      <nav className="flex justify-start items-end gap-1 mb-3">
         <button
           onClick={() => onTabChange("new")}
           className={`text-[0.9rem] font-medium tracking-wide px-3 py-2 pb-2 -mb-px border-b-2 transition-all duration-200 ${
