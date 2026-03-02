@@ -191,7 +191,7 @@ export default function EditorView({
           {isViewMode ? (
             <>
               <span className="flex items-center gap-2 text-[14px] text-[var(--color-stone-400)]">
-                <Check className="w-[16px] h-[16px] shrink-0 text-[var(--color-stone-600)]" title="Published" />
+                <span title="Published"><Check className="w-[16px] h-[16px] shrink-0 text-[var(--color-stone-600)]" /></span>
                 {wordCount} word{wordCount !== 1 ? "s" : ""}
               </span>
               {onEnterEditMode && (
